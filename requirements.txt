@@ -12,3 +12,4 @@ pandas==2.2.3
 Pillow==11.0.0
 unicode-tr==0.6.1
 pdfkit==1.0.0
+reportlab==4.4.4

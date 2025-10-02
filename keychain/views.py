@@ -1,3 +1,16 @@
+import re
+import io
+import os
+import pdfkit
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.colors import HexColor
+from reportlab.lib.units import cm
+from reportlab.lib.enums import TA_CENTER
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, View, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -16,9 +29,7 @@ from users.models import User
 from django.db import models
 from datetime import datetime, timedelta
 from django.template.loader import render_to_string
-import os
 from django.utils.html import strip_tags
-import re
 
 SYSTEM_TYPE_CHOICES = {
     '1': 'Database',
@@ -947,12 +958,6 @@ class ActivityExportExcelView(LoginRequiredMixin, View):
 class ActivityExportPDFView(LoginRequiredMixin, View):
     def post(self, request):
         try:
-            import pdfkit
-            from django.http import HttpResponse
-            from django.template.loader import render_to_string
-            from django.conf import settings
-            import os
-            
             activity_ids = request.POST.getlist('activity_ids')
             if not activity_ids:
                 return JsonResponse({'success': False, 'error': 'Seçili faaliyet bulunamadı'})
@@ -1013,29 +1018,9 @@ class ActivityExportPDFView(LoginRequiredMixin, View):
                 'no-outline': None,
                 'enable-local-file-access': None
             }
-            
-            wkhtmltopdf_path = None
-            possible_paths = [
-                r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe',
-                r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe',
-                'wkhtmltopdf'
-            ]
-            
-            for path in possible_paths:
-                if os.path.exists(path) or path == 'wkhtmltopdf':
-                    wkhtmltopdf_path = path
-                    break
-            
-            if not wkhtmltopdf_path:
-                return JsonResponse({
-                    'success': False, 
-                    'error': 'wkhtmltopdf bulunamadı. Lütfen https://wkhtmltopdf.org/downloads.html adresinden indirip kurun.'
-                })
-            
-            config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
-            
+                                    
             try:
-                pdf_content = pdfkit.from_string(html_content, False, options=options, configuration=config)
+                pdf_content = pdfkit.from_string(html_content, False, options=options)
                 
                 response = HttpResponse(pdf_content, content_type='application/pdf')
                 response['Content-Disposition'] = f'attachment; filename="faaliyet_raporu_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf"'
@@ -1060,18 +1045,7 @@ class ActivityExportPDFView(LoginRequiredMixin, View):
 
 class ActivityExportPDFTestView(LoginRequiredMixin, View):
     def post(self, request):
-        try:
-            from reportlab.lib.pagesizes import A4
-            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
-            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-            from reportlab.lib.colors import HexColor
-            from reportlab.lib.units import cm
-            from reportlab.lib.enums import TA_CENTER
-            from django.http import HttpResponse
-            import io
-            import os
-            from django.conf import settings
-            
+        try:           
             pdf_buffer = io.BytesIO()
             
             doc = SimpleDocTemplate(
