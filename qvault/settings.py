@@ -57,7 +57,7 @@ MIDDLEWARE = [
     "utils.middleware.IdleTimeoutMiddleware",
 ]
 
-ROOT_URLCONF = 'qvaultapp.urls'
+ROOT_URLCONF = 'qvault.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'qvaultapp.wsgi.application'
+WSGI_APPLICATION = 'qvault.wsgi.application'
 
 
 # Database
