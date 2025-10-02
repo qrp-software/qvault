@@ -1,0 +1,5 @@
+from .main import *
+
+ALLOWED_HOSTS = ["*"]
+AUTH_PASSWORD_VALIDATORS = []
+SECURE_SSL_REDIRECT = False
