@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from teknopark.models import (
+    TeknoparkUser,
     TeknoparkPDKSEntryLog,
     TeknoparkPDKSEntry,
     TeknoparkPDKSMonthlyReport,
@@ -7,10 +8,28 @@ from teknopark.models import (
 from users.api.serializers import UserSerializer
 
 
+class TeknoparkUserSerializer(serializers.ModelSerializer):
+    """Teknopark user serializer"""
+    
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = TeknoparkUser
+        fields = [
+            "id",
+            "user",
+            "is_active",
+            "weekly_working_hours",
+            "created_date",
+            "modified_date",
+        ]
+        read_only_fields = ["id", "created_date", "modified_date"]
+
+
 class TeknoparkPDKSEntryLogSerializer(serializers.ModelSerializer):
     """PDKS giriş log serializer"""
 
-    user = UserSerializer(read_only=True)
+    teknopark_user = TeknoparkUserSerializer(read_only=True)
     log_type_display = serializers.CharField(
         source="get_log_type_display",
         read_only=True,
@@ -20,19 +39,23 @@ class TeknoparkPDKSEntryLogSerializer(serializers.ModelSerializer):
         model = TeknoparkPDKSEntryLog
         fields = [
             "id",
-            "user",
+            "teknopark_user",
             "log_type",
             "log_type_display",
             "timestamp",
             "created_date",
             "modified_date",
         ]
-        read_only_fields = ["id", "user", "created_date", "modified_date"]
+        read_only_fields = ["id", "teknopark_user", "created_date", "modified_date"]
 
     def create(self, validated_data):
-        # Kullanıcıyı request'ten al
+        # Teknopark kullanıcısını request'ten al
         user = self.context["request"].user
-        validated_data["user"] = user
+        try:
+            teknopark_user = TeknoparkUser.objects.get(user=user)
+        except TeknoparkUser.DoesNotExist:
+            raise serializers.ValidationError("Teknopark kullanıcısı bulunamadı")
+        validated_data["teknopark_user"] = teknopark_user
 
         return super().create(validated_data)
 
@@ -40,13 +63,13 @@ class TeknoparkPDKSEntryLogSerializer(serializers.ModelSerializer):
 class TeknoparkPDKSEntrySerializer(serializers.ModelSerializer):
     """Daily attendance serializer"""
 
-    user = UserSerializer(read_only=True)
+    teknopark_user = TeknoparkUserSerializer(read_only=True)
 
     class Meta:
         model = TeknoparkPDKSEntry
         fields = [
             "id",
-            "user",
+            "teknopark_user",
             "date",
             "total_hours",
             "entry_count",
@@ -57,7 +80,7 @@ class TeknoparkPDKSEntrySerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
-            "user",
+            "teknopark_user",
             "total_hours",
             "entry_count",
             "first_entry",
@@ -70,7 +93,7 @@ class TeknoparkPDKSEntrySerializer(serializers.ModelSerializer):
 class TeknoparkPDKSMonthlyReportSerializer(serializers.ModelSerializer):
     """Monthly report serializer"""
 
-    user = UserSerializer(read_only=True)
+    teknopark_user = TeknoparkUserSerializer(read_only=True)
     month_display = serializers.CharField(
         source="get_month_display",
         read_only=True,
@@ -80,19 +103,23 @@ class TeknoparkPDKSMonthlyReportSerializer(serializers.ModelSerializer):
         model = TeknoparkPDKSMonthlyReport
         fields = [
             "id",
-            "user",
+            "teknopark_user",
             "year",
             "month",
             "month_display",
             "total_hours",
+            "required_hours",
+            "remaining_hours",
             "total_days",
             "average_hours_per_day",
             "last_calculated",
         ]
         read_only_fields = [
             "id",
-            "user",
+            "teknopark_user",
             "total_hours",
+            "required_hours",
+            "remaining_hours",
             "total_days",
             "average_hours_per_day",
             "last_calculated",
@@ -107,9 +134,13 @@ class TeknoparkPDKSEntryLogCreateSerializer(serializers.ModelSerializer):
         fields = ["log_type", "timestamp"]
 
     def create(self, validated_data):
-        # Kullanıcıyı request'ten al
+        # Teknopark kullanıcısını request'ten al
         user = self.context["request"].user
-        validated_data["user"] = user
+        try:
+            teknopark_user = TeknoparkUser.objects.get(user=user)
+        except TeknoparkUser.DoesNotExist:
+            raise serializers.ValidationError("Teknopark kullanıcısı bulunamadı")
+        validated_data["teknopark_user"] = teknopark_user
 
         return super().create(validated_data)
 

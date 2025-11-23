@@ -1,17 +1,53 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
+    TeknoparkUser,
     TeknoparkPDKSEntryLog,
     TeknoparkPDKSEntry,
     TeknoparkPDKSMonthlyReport,
 )
 
 
+@admin.register(TeknoparkUser)
+class TeknoparkUserAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+        "is_active",
+        "weekly_working_hours",
+        "created_date",
+        "modified_date",
+    ]
+    list_filter = ["is_active", "created_date"]
+    search_fields = ["user__username", "user__email"]
+    readonly_fields = ["created_date", "modified_date"]
+    ordering = ["-created_date"]
+
+    fieldsets = (
+        (
+            "Temel Bilgiler",
+            {
+                "fields": (
+                    "user",
+                    "is_active",
+                    "weekly_working_hours",
+                    "weekly_working_days",
+                ),
+            },
+        ),
+        (
+            "Sistem Bilgileri",
+            {
+                "fields": ("created_date", "modified_date"),
+            },
+        ),
+    )
+
+
 @admin.register(TeknoparkPDKSEntryLog)
 class TeknoparkPDKSEntryLogAdmin(admin.ModelAdmin):
-    list_display = ["user", "log_type_display", "timestamp", "created_date"]
+    list_display = ["teknopark_user", "log_type_display", "timestamp", "created_date"]
     list_filter = ["log_type", "timestamp", "created_date"]
-    search_fields = ["user__username", "user__email"]
+    search_fields = ["teknopark_user__user__username", "teknopark_user__user__email"]
     readonly_fields = ["created_date", "modified_date"]
     date_hierarchy = "timestamp"
     ordering = ["-timestamp"]
@@ -20,7 +56,7 @@ class TeknoparkPDKSEntryLogAdmin(admin.ModelAdmin):
         (
             "Temel Bilgiler",
             {
-                "fields": ("user", "log_type", "timestamp"),
+                "fields": ("teknopark_user", "log_type", "timestamp"),
             },
         ),
         (
@@ -40,7 +76,7 @@ class TeknoparkPDKSEntryLogAdmin(admin.ModelAdmin):
 @admin.register(TeknoparkPDKSEntry)
 class TeknoparkPDKSEntryAdmin(admin.ModelAdmin):
     list_display = [
-        "user",
+        "teknopark_user",
         "date",
         "total_hours",
         "entry_count",
@@ -48,7 +84,7 @@ class TeknoparkPDKSEntryAdmin(admin.ModelAdmin):
         "last_exit",
     ]
     list_filter = ["date", "created_date"]
-    search_fields = ["user__username", "user__email"]
+    search_fields = ["teknopark_user__user__username", "teknopark_user__user__email"]
     readonly_fields = [
         "total_hours",
         "entry_count",
@@ -64,7 +100,7 @@ class TeknoparkPDKSEntryAdmin(admin.ModelAdmin):
         (
             "Temel Bilgiler",
             {
-                "fields": ("user", "date"),
+                "fields": ("teknopark_user", "date"),
             },
         ),
         (
@@ -102,18 +138,22 @@ class TeknoparkPDKSEntryAdmin(admin.ModelAdmin):
 @admin.register(TeknoparkPDKSMonthlyReport)
 class TeknoparkPDKSMonthlyReportAdmin(admin.ModelAdmin):
     list_display = [
-        "user",
+        "teknopark_user",
         "year",
         "month_display",
         "total_hours",
+        "required_hours",
+        "remaining_hours",
         "total_days",
         "average_hours_per_day",
         "last_calculated",
     ]
     list_filter = ["year", "month", "last_calculated"]
-    search_fields = ["user__username", "user__email"]
+    search_fields = ["teknopark_user__user__username", "teknopark_user__user__email"]
     readonly_fields = [
         "total_hours",
+        "required_hours",
+        "remaining_hours",
         "total_days",
         "average_hours_per_day",
         "last_calculated",
@@ -124,7 +164,7 @@ class TeknoparkPDKSMonthlyReportAdmin(admin.ModelAdmin):
         (
             "Temel Bilgiler",
             {
-                "fields": ("user", "year", "month"),
+                "fields": ("teknopark_user", "year", "month"),
             },
         ),
         (
@@ -132,6 +172,8 @@ class TeknoparkPDKSMonthlyReportAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "total_hours",
+                    "required_hours",
+                    "remaining_hours",
                     "total_days",
                     "average_hours_per_day",
                 ),
