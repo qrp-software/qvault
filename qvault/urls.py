@@ -20,6 +20,8 @@ urlpatterns = [
     path("thanks/", views.ThanksPage.as_view(), name="thanks"),
     path('', RedirectView.as_view(url='/keychain/', permanent=False), name='home'),
     path("keychain/", include("keychain.urls", namespace="keychain")),
+    path("teknopark/", include("teknopark.urls", namespace="teknopark")),
+    path("users/api/", include("users.api.urls", namespace="users_api")),
 ]
 
 urlpatterns += i18n_patterns(
