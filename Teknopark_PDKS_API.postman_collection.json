@@ -1,0 +1,626 @@
+{
+	"info": {
+		"_postman_id": "teknopark-pdks-api",
+		"name": "Teknopark PDKS API",
+		"description": "Teknopark Personel Devam Kontrol Sistemi (PDKS) API Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"access_token\", jsonData.access);",
+									"    pm.environment.set(\"refresh_token\", jsonData.refresh);",
+									"    pm.environment.set(\"user_id\", jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/api/login/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"api",
+								"login",
+								""
+							]
+						},
+						"description": "Kullanıcı girişi yaparak JWT token alınır."
+					},
+					"response": []
+				}
+			],
+			"description": "Kimlik doğrulama endpoint'leri"
+		},
+		{
+			"name": "PDKS Logs",
+			"item": [
+				{
+					"name": "List All Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/logs/?log_type={{log_type}}&date_from={{date_from}}&date_to={{date_to}}&page={{page}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"logs",
+								""
+							],
+							"query": [
+								{
+									"key": "log_type",
+									"value": "{{log_type}}",
+									"description": "entry veya exit",
+									"disabled": true
+								},
+								{
+									"key": "date_from",
+									"value": "{{date_from}}",
+									"description": "YYYY-MM-DD formatında",
+									"disabled": true
+								},
+								{
+									"key": "date_to",
+									"value": "{{date_to}}",
+									"description": "YYYY-MM-DD formatında",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "{{page}}",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Kullanıcının tüm giriş/çıkış loglarını listeler."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Today's Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/logs/today/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"logs",
+								"today",
+								""
+							]
+						},
+						"description": "Kullanıcının bugünkü tüm loglarını getirir."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Log Entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"log_type\": \"entry\",\n    \"timestamp\": \"{{timestamp}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/logs/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"logs",
+								""
+							]
+						},
+						"description": "Yeni bir giriş veya çıkış logu oluşturur. log_type: 'entry' veya 'exit', timestamp: ISO 8601 formatında (opsiyonel)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Log by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/logs/{{log_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"logs",
+								"{{log_id}}",
+								""
+							]
+						},
+						"description": "Belirli bir log kaydının detaylarını getirir."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Log",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"log_type\": \"exit\",\n    \"timestamp\": \"{{timestamp}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/logs/{{log_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"logs",
+								"{{log_id}}",
+								""
+							]
+						},
+						"description": "Mevcut bir log kaydını günceller."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Log",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/logs/{{log_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"logs",
+								"{{log_id}}",
+								""
+							]
+						},
+						"description": "Bir log kaydını siler."
+					},
+					"response": []
+				}
+			],
+			"description": "PDKS giriş/çıkış log endpoint'leri"
+		},
+		{
+			"name": "Daily Attendance",
+			"item": [
+				{
+					"name": "List All Daily Entries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/daily/?date_from={{date_from}}&date_to={{date_to}}&page={{page}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"daily",
+								""
+							],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "{{date_from}}",
+									"description": "YYYY-MM-DD formatında",
+									"disabled": true
+								},
+								{
+									"key": "date_to",
+									"value": "{{date_to}}",
+									"description": "YYYY-MM-DD formatında",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "{{page}}",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Kullanıcının tüm günlük yoklama kayıtlarını listeler."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Today's Entry",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/daily/today/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"daily",
+								"today",
+								""
+							]
+						},
+						"description": "Kullanıcının bugünkü yoklama kaydını getirir. Eğer bugün için kayıt yoksa otomatik olarak oluşturulur."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/daily/summary/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"daily",
+								"summary",
+								""
+							]
+						},
+						"description": "Kullanıcının tüm yoklama kayıtlarının özet istatistiklerini getirir."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Daily Entry by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/daily/{{daily_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"daily",
+								"{{daily_id}}",
+								""
+							]
+						},
+						"description": "Belirli bir günlük yoklama kaydının detaylarını getirir."
+					},
+					"response": []
+				}
+			],
+			"description": "Günlük yoklama endpoint'leri (sadece okuma)"
+		},
+		{
+			"name": "Monthly Reports",
+			"item": [
+				{
+					"name": "List All Monthly Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/monthly/?year={{year}}&month={{month}}&page={{page}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"monthly",
+								""
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}",
+									"description": "Yıl (örn: 2025)",
+									"disabled": true
+								},
+								{
+									"key": "month",
+									"value": "{{month}}",
+									"description": "Ay (1-12 arası)",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "{{page}}",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Kullanıcının tüm aylık raporlarını listeler."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Month Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/monthly/current_month/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"monthly",
+								"current_month",
+								""
+							]
+						},
+						"description": "Kullanıcının bu ayın raporunu getirir. Eğer bu ay için rapor yoksa otomatik olarak oluşturulur."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Monthly Report by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/monthly/{{report_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"monthly",
+								"{{report_id}}",
+								""
+							]
+						},
+						"description": "Belirli bir aylık raporun detaylarını getirir."
+					},
+					"response": []
+				},
+				{
+					"name": "Recalculate Monthly Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/teknopark/api/pdks/monthly/{{report_id}}/recalculate/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teknopark",
+								"api",
+								"pdks",
+								"monthly",
+								"{{report_id}}",
+								"recalculate",
+								""
+							]
+						},
+						"description": "Belirli bir aylık raporu yeniden hesaplar."
+					},
+					"response": []
+				}
+			],
+			"description": "Aylık rapor endpoint'leri (sadece okuma, recalculate hariç)"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "your_username",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "your_password",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "log_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "daily_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "report_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "log_type",
+			"value": "entry",
+			"type": "string"
+		},
+		{
+			"key": "date_from",
+			"value": "2025-01-01",
+			"type": "string"
+		},
+		{
+			"key": "date_to",
+			"value": "2025-01-31",
+			"type": "string"
+		},
+		{
+			"key": "year",
+			"value": "2025",
+			"type": "string"
+		},
+		{
+			"key": "month",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "page",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "timestamp",
+			"value": "2025-01-15T09:00:00Z",
+			"type": "string"
+		}
+	]
+}
+
