@@ -71,6 +71,55 @@ curl -X POST http://localhost:8000/users/api/login/ \
 
 ---
 
+### 1.2. Token Yenile (Refresh Token)
+
+Access token süresi dolduğunda, refresh token kullanarak yeni access token alınır. Bu endpoint, mobil uygulamanın otomatik olarak token yenilemesi için kullanılmalıdır.
+
+**Endpoint:** `POST /users/api/refresh/`
+
+**Kimlik Doğrulama:** Gerekli değil
+
+**Request Body:**
+```json
+{
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+**Not:** `ROTATE_REFRESH_TOKENS` ayarı `True` olduğu için, refresh token kullanıldığında yeni bir refresh token da döner. Mobil uygulama bu yeni refresh token'ı saklamalıdır.
+
+**Hata Durumları:**
+- `401 Unauthorized`: Refresh token geçersiz veya süresi dolmuş
+- `400 Bad Request`: Refresh token gönderilmemiş
+
+**Örnek cURL:**
+```bash
+curl -X POST http://localhost:8000/users/api/refresh/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refresh": "YOUR_REFRESH_TOKEN"
+  }'
+```
+
+**Mobil Uygulama İçin Önemli Notlar:**
+1. **Access token süresi 2 saattir.** Mobil uygulama, token süresi dolmadan önce (örneğin 1.5 saatte) otomatik olarak refresh işlemi yapmalıdır.
+2. **API isteklerinde 401 (Unauthorized) hatası alındığında**, otomatik olarak refresh token kullanarak yeni token alınmalı ve istek tekrar edilmelidir.
+3. **Refresh token süresi 30 gündür.** Ancak `ROTATE_REFRESH_TOKENS=True` olduğu için:
+   - Her refresh işleminde yeni bir refresh token döner ve süre sıfırlanır
+   - Kullanıcı 30 gün içinde en az bir kez uygulamayı açıp refresh yaparsa, login gerekmez
+   - Kullanıcı 30 gün boyunca hiç refresh yapmazsa (uygulamayı hiç açmazsa), refresh token süresi dolar ve login gerekir
+4. **Token yönetimi:** Her refresh işleminde dönen yeni refresh token'ı mutlaka saklamalısınız. Eski refresh token artık geçersizdir.
+
+---
+
 ## 2. PDKS Log Endpoint'leri
 
 ### 2.1. Tüm Logları Listele
@@ -630,7 +679,7 @@ GET /teknopark/api/pdks/daily/?date_from=2025-01-01&date_to=2025-01-31
 
 4. **Otomatik Hesaplama:** Günlük yoklamalar ve aylık raporlar, log kayıtlarına göre otomatik olarak hesaplanır.
 
-5. **Güvenlik:** Tüm endpoint'ler (login hariç) JWT token gerektirir. Token'lar 1 gün geçerlidir. Süresi dolduğunda refresh token kullanılarak yeni token alınabilir.
+5. **Güvenlik:** Tüm endpoint'ler (login hariç) JWT token gerektirir. Access token'lar 2 saat geçerlidir. Süresi dolduğunda refresh token kullanılarak yeni token alınabilir. Refresh token'lar 30 gün geçerlidir, ancak her refresh işleminde yeni refresh token döner ve süre sıfırlanır. Mobil uygulamalar, access token süresi dolmadan önce otomatik olarak token yenileme işlemi yapmalıdır.
 
 ---
 

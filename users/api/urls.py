@@ -5,5 +5,6 @@ app_name = "users_api"
 
 urlpatterns = [
     path("login/", views.LoginView.as_view(), name="login"),
+    path("refresh/", views.RefreshTokenView.as_view(), name="refresh"),
 ]
 
