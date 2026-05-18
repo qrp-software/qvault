@@ -198,6 +198,43 @@
             Faaliyetler
           </a>
         </li>
+        {% if user.is_superuser %}
+        <li class="nav-item">
+          <a class="nav-link text-white d-flex justify-content-between align-items-center {% if request.resolver_match.namespace == 'teknopark' %}active{% endif %}"
+             href="#teknoparkCollapse"
+             data-bs-toggle="collapse"
+             aria-expanded="{% if request.resolver_match.namespace == 'teknopark' %}true{% else %}false{% endif %}"
+             aria-controls="teknoparkCollapse">
+            <span>
+              <i class="fas fa-building me-2"></i>
+              Teknopark
+            </span>
+            <i class="fas fa-chevron-down transition-transform"></i>
+          </a>
+          <div class="collapse {% if request.resolver_match.namespace == 'teknopark' %}show{% endif %}" id="teknoparkCollapse">
+            <ul class="nav nav-pills flex-column ms-3 mt-2">
+              <li class="nav-item">
+                <a class="nav-link text-white-50 {% if request.resolver_match.url_name == 'admin_user_list' %}active text-white{% endif %}"
+                   href="{% url 'teknopark:admin_user_list' %}">
+                  <i class="fas fa-users me-2"></i>Kullanicilar
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white-50 {% if request.resolver_match.url_name == 'admin_entry_list' %}active text-white{% endif %}"
+                   href="{% url 'teknopark:admin_entry_list' %}">
+                  <i class="fas fa-calendar-day me-2"></i>Gunluk Yoklama
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white-50 {% if request.resolver_match.url_name == 'admin_monthly_report_list' %}active text-white{% endif %}"
+                   href="{% url 'teknopark:admin_monthly_report_list' %}">
+                  <i class="fas fa-chart-line me-2"></i>Aylik Raporlar
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        {% endif %}
       </ul>
       <hr>
       <div class="dropdown">

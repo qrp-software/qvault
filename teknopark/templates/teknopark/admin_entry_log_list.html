@@ -1,0 +1,68 @@
+{% extends "keychain/base.html" %}
+
+{% block title %}PDKS Log Listesi{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h1 class="h3 fw-bold mb-1"><i class="fas fa-clipboard-list me-2"></i>PDKS Log Listesi</h1>
+            <p class="text-muted mb-0">Kullanici: {{ teknopark_user.user.username }}</p>
+        </div>
+        <a href="{% url 'teknopark:admin_user_detail' teknopark_user.id %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Kullanici Detayina Don
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-2 mb-3">
+                <div class="col-md-3">
+                    <select name="log_type" class="form-select">
+                        <option value="" {% if not selected_log_type %}selected{% endif %}>Tum Tipler</option>
+                        <option value="entry" {% if selected_log_type == 'entry' %}selected{% endif %}>Giris</option>
+                        <option value="exit" {% if selected_log_type == 'exit' %}selected{% endif %}>Cikis</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filtrele</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'teknopark:admin_user_log_list' teknopark_user.id %}" class="btn btn-outline-secondary w-100">Temizle</a>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Zaman</th>
+                            <th>Tip</th>
+                            <th>Olusturma</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.timestamp|date:"d.m.Y H:i:s" }}</td>
+                            <td>
+                                {% if log.log_type == 'entry' %}
+                                    <span class="badge text-bg-success">Giris</span>
+                                {% else %}
+                                    <span class="badge text-bg-danger">Cikis</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ log.created_date|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">Log kaydi bulunamadi.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -100,6 +100,36 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card modern-card h-100">
+                <div class="card-header bg-white py-4">
+                    <h5 class="card-title mb-0 text-primary fw-bold">
+                        <i class="fas fa-building me-2"></i>
+                        Teknopark Yönetimi
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">
+                        Teknopark kullanıcılarını, PDKS giriş loglarını, günlük yoklamaları ve aylık raporları görüntüleyin.
+                    </p>
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'teknopark:admin_user_list' %}" class="btn modern-btn modern-btn-primary">
+                            <i class="fas fa-users me-2"></i>
+                            Teknopark Kullanıcıları
+                        </a>
+                        <a href="{% url 'teknopark:admin_entry_list' %}" class="btn modern-btn modern-btn-outline">
+                            <i class="fas fa-calendar-day me-2"></i>
+                            Günlük Yoklamalar
+                        </a>
+                        <a href="{% url 'teknopark:admin_monthly_report_list' %}" class="btn modern-btn modern-btn-outline">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Aylık Raporlar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Recent Users -->
